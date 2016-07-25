@@ -45,7 +45,13 @@ if __name__ == '__main__':
             # Remove this arg from array to prevent TestProgram processing it
             api_version = arg[14]
             sys.argv.remove(arg)
+            run_tests(api_version, group_selected)
         elif arg[:8] == '--group=':
             group_selected = True
-
-    run_tests(api_version, group_selected)
+            run_tests(api_version, group_selected)
+        else:
+            import benchmark.ansible_manipulation as ansible
+            if arg[:5] == 'start':
+                ansible.start()
+            elif arg[:4] == 'stop':
+                ansible.stop()

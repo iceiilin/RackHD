@@ -20,16 +20,19 @@ from tests.api.v1_1.discovery_tests import DiscoveryTests
 from tests.api.v1_1.poller_tests import PollerTests
 from tests.api.v1_1.workflows_tests import WorkflowsTests
 
-from benchmark import ansible_ctl
 from benchmark.utils import parser
 from benchmark.utils.case_recorder import caseRecorder
+from benchmark.utils.ansible_control import ansibleControl
 
 LOG = Log(__name__)
 
 class BenchmarkTests(object):
     def __init__(self, name):
-        ansible_ctl.render_case_name(name)
-        self.__data_path = ansible_ctl.get_data_path_per_case()
+
+        self.ansible_ctl = ansibleControl()
+        self.ansible_ctl.setup_env()
+        self.ansible_ctl.render_case_name(name)
+        self.__data_path = self.ansible_ctl.get_data_path_per_case()
         self.case_recorder = caseRecorder(self.__data_path)
         self.client = config.api_client
         self.__node_count = 0
@@ -38,15 +41,15 @@ class BenchmarkTests(object):
 
     def _prepare_case_env(self):
         self.__node_count = self.__check_compute_count()
-        self.case_recorder.write_interval(ansible_ctl.get_data_interval())
+        self.case_recorder.write_interval(self.ansible_ctl.get_data_interval())
         self.case_recorder.write_start()
         self.case_recorder.write_node_number(self.__node_count)
 
-        assert_equal(True, ansible_ctl.start_daemon(), \
+        assert_equal(True, self.ansible_ctl.start_daemon(), \
                     message='Failed to start data collection daemon!')
 
     def _collect_case_data(self):
-        assert_equal(True, ansible_ctl.collect_data(), message='Failed to collect footprint data!')
+        assert_equal(True, self.ansible_ctl.collect_data(), message='Failed to collect footprint data!')
         self.case_recorder.write_end()
 
         LOG.info('Parse log and generate html reports')

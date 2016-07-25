@@ -26,7 +26,6 @@ class ansibleControl(object):
         self.__config_case_name = 'test_case_name'
         self.__config_interval = 'data_interval'
 
-        self.__set_data_path()
         self.__set_host_port()
         self.__hosts = self.__get_hosts()
 
@@ -157,6 +156,7 @@ class ansibleControl(object):
         os.remove(self.__hosts.name)
 
     def setup_env(self):
+        self.__set_data_path()
         return self.__run_playbook('setup_env.yml')
 
     def start_daemon(self):
